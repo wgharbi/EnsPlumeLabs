@@ -46,15 +46,56 @@ def stats(data):
     global_stats = feature_stats[feature_stats["Station"]=='global']
     stations_stats = feature_stats[feature_stats["Station"]!='global']
     print "---------------------------------"
-    print "Statistiques sur les stations : "
+    print "Statistics per station : "
     print stations_stats.describe()
     print ""
     print "---------------------------------"
-    print "Statistiques globales : "
+    print "Global statistics : "
     print global_stats.describe()
+
+    print "---------------------------------"   
+    index=(feature_stats["Feature"].isin(['NO2']))
+    filtered=feature_stats[index]
+    print "Stations analysing NO2 : "
+    print filtered["Station"].unique()
+    print("")
     
+    index=(feature_stats["Feature"].isin(['O3']))
+    filtered=feature_stats[index]
+    print "Stations analysing O3 : "
+    print filtered["Station"].unique()
+    print("")
+    
+    index=(feature_stats["Feature"].isin(['PM10']))
+    filtered=feature_stats[index]
+    print "Stations analysing PM10 : "
+    print filtered["Station"].unique()
+    print("")
+    
+    index=(feature_stats["Feature"].isin(['PM2']))
+    filtered=feature_stats[index]
+    print "Stations analysing PM2 : "
+    print filtered["Station"].unique()
+    print("")
+    
+    index=(feature_stats["Feature"].isin(['NO2',"PM2","O3","PM10"]))
+    filtered=feature_stats[index]
+    print "Features available for these 4 markers :"
+    print filtered["Feature"].value_counts()
+    
+    
+    features_available_station=[]
+    station_names=feature_stats["Station"].unique().astype(str)
+    for i in range(len(station_names)):
+        temp = feature_stats[feature_stats["Station"]==station_names[i]]
+        features_available=temp["Feature"].unique().astype(str)
+        line=[station_names[i]]
+        for j in range(len(features_available)): #loop over the features available for the station
+            line.append(features_available[j])
+        features_available_station.append(line)
         
-    return global_stats,stations_stats, feature_stats
+        
+    return global_stats,stations_stats, feature_stats, features_available_station
     
 def plot_stats(feature_stats):
     plt.figure()
@@ -66,6 +107,9 @@ def plot_stats(feature_stats):
     feature_stats["Station"].value_counts().plot(kind="bar")
     plt.xlabel="N° de station"
     plt.ylabel="Nb de features disponibles"
+    
+    
+    
     
 def plot_stations(feature_stats):
     import  matplotlib.colors as cl
