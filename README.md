@@ -7,14 +7,14 @@ For more information: https://challengedata.ens.fr/en/challenge/2/predict_pollut
 The aim of this challenge is to concentration of some pollutants for the next 24 hours at a particular point in an asian megacity given some pollution measurement and some meteo measurement and prediction at this particular points and at some other points in and around this megacity
 
 
-Contributors: 
+### Contributors: 
 
 
 Wiem Gharbi wiem.gahrbi@polytechnique.edu 
 
 Hugo Vallet hugo.vallet@polytechnique.edu 
 
-Challenge context
+### Challenge context
 
 Plume Labs is a start up company whose goals is to provide everyone with some information regarding the level of pollution so that they will know about it and be able to act so as to reduce the impact on their health.
 
