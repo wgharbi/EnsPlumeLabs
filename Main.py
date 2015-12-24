@@ -12,7 +12,7 @@ import csv
 import networkx as nx
 import seaborn as sb
 
-sb.set_context() #Let's make some beautiful graphs !
+sb.set_context() #Let's make some beautiful graphs ! (optionnal)
 
 data_train = pd.read_csv("./train.csv")
 writer = csv.writer(open("./labels.csv", 'w'))
@@ -72,8 +72,8 @@ plt.show()
 #%% Let's have a look at the weights, in average, of the regression coefficients
 fig, ax = plt.subplots()
 ax.bar(np.arange(0,3728),np.mean(coefs,axis=0), color = "blue")
-ax.set_xlabel('Indice du coefficent')
-ax.set_ylabel("Poids moyen")
+ax.set_xlabel('Coefficent index')
+ax.set_ylabel("Average value")
 plt.show()
 
 #%% Write the final solution for submission
