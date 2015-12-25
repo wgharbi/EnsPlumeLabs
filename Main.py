@@ -25,6 +25,88 @@ global_stats,stations_stats, feature_stats, features_available_station = stats(d
 plot_stats(feature_stats)
 plot_stations(feature_stats)
 
+#%% Plot the variations of polutants during the full period
+plot_polutants_time_series(data_train)
+
+
+#%% Edit 25/12 : new idea : check the correlation bteween the features to be predicted (if not correlated create individual predictors...)
+from sklearn.preprocessing import scale
+data_to_predict=scale(data_labels,axis=0) #Rescale each columns
+cov_mat=np.abs(np.cov(data_to_predict.T))
+
+xlabels=12*[""]+["PM2_5"]+24*[""]+["PM10"]+24*[""]+["O3"]+24*[""]+["NO2"]
+ylabels=12*[""]+["PM2_5"]+24*[""]+["PM10"]+24*[""]+["O3"]+24*[""]+["NO2"]
+
+plt.figure()
+plt.hold('on')
+sb.heatmap(cov_mat,cmap="Greys",square=False,xticklabels=xlabels,yticklabels=ylabels)
+#plt.plot([96,0],[96,0],color="red",LineWidth=2)
+plt.title("Correlation between the features to predict (in the train dataset)")
+plt.hold('off')
+plt.show()
+
+#Filter the lines repeating the same days to keep only different days
+data_to_predict2=scale(data_labels.iloc[0:4031:24,:],axis=0) #Rescale each columns
+cov_mat2=np.abs(np.cov(data_to_predict2.T))
+
+plt.figure()
+plt.hold('on')
+plt.hold('on')
+sb.heatmap(cov_mat2,cmap="Greys",square=False,xticklabels=xlabels,yticklabels=ylabels)
+#plt.plot([96,0],[96,0],color="red",LineWidth=2)
+plt.title("Correlation between the features to predict after filtering (in the train dataset)")
+plt.hold('off')
+plt.show()
+
+"""Interpretation of the results :
+    Each square is a correlation matrix of 24 features to be predicted in the following
+    order : PM2,PM10,O3,NO2
+    - PM2 and PM10 are highly correlated to themselves on a 24h window (size of the squares)
+    meaning that these polutants are less volatile and thus less prone to high variations
+    than NO2 and 03. These last two are highly correlated to themselves for only few hours
+    - PM2 and PM10 are highly correlated : their correlation squares are almost similar.
+    At the same hour, they have approximataly the same value
+    - O3 is not correlated to PMs and middly correlated to NO2
+    - NO2 is middly correlated to the 3 
+"""    
+#%% Let's do the same thing with the input data
+"""Note for Wiem : 
+    Les données d'entrée sont super corrélées dans la mesure où le dataset est constitué 
+    de jour glissants (ie, une ligne = la ligne précédente translatée d'1h), du coup, lignes
+    et features sont fortement corrélés, en atteste la figure suivante, ce qui peut être 
+    problématique pour la régression (générer de l'over-fitting)...
+    """
+data_to_train=scale(data_train,axis=0) #Rescale each columns
+cov_mat=np.abs(np.cov(data_to_train.T))
+
+plt.figure()
+plt.hold('on')
+plt.imshow(np.array(cov_mat))
+plt.colorbar()
+plt.tick_params(which='both', bottom='off', top='off', labelbottom='off')
+plt.hold('off')
+plt.show()
+
+#Filter the lines repeating the same days to keep only different days
+data_to_train2=scale(data_train.iloc[0:4031:24,:],axis=0) #Rescale each columns and take only different days
+cov_mat2=np.abs(np.cov(data_to_train2.T))
+
+plt.figure()
+plt.hold('on')
+plt.imshow(np.array(cov_mat2))
+plt.colorbar()
+plt.tick_params(which='both', bottom='off', top='off', labelbottom='off')
+plt.hold('off')
+plt.show()
+
+"""Interpreting the results
+Globally, the data columns are not really correlated, exept for a set of indicators : the wind indicators
+This explains the repating diagonal black pattern (appears 17 times on a line because there are
+17 stations measuring the wind speed and direction). This seems logical : if the stations are
+not too far from each other, they will measure similar couples (wind speed, wind direction)
+
+"""
+
 #%% Let's remove the date column
 data_train = data_train.iloc[:,1:]
 data_test = data_test.iloc[:,1:]
@@ -59,6 +141,7 @@ print "MSE : ", mean_squared_error(y_test,y_pred)
 print "R2 : ",r2_score(y_test,y_pred)
 
 fig, ax = plt.subplots()
+plt.hold("on")
 ax.plot(np.arange(0,96),np.mean(y_test,axis=0),color="red",label="Average real value")
 ax.plot(np.arange(0,96),np.mean(y_pred,axis=0),color="blue",label="Average predicted value")
 ax.axvline(x=24,color="grey",linestyle="dashed")
@@ -67,16 +150,26 @@ ax.axvline(x=72,color="grey",linestyle="dashed")
 ax.set_xlabel('Polutant')
 ax.set_ylabel("Concentration")
 ax.legend(loc="lower right")
+plt.hold("off")
 plt.show()
 
 #%% Let's have a look at the weights, in average, of the regression coefficients
+
+coefs=clf.coef_
 fig, ax = plt.subplots()
 ax.bar(np.arange(0,3728),np.mean(coefs,axis=0), color = "blue")
 ax.set_xlabel('Coefficent index')
 ax.set_ylabel("Average value")
 plt.show()
 
+#check the most important coeffs, in averaged
+threshold = 0.3
+important_coefs=np.abs(np.mean(coefs,axis=0))>threshold
+important_coefs_names=data_train.columns[important_coefs]
+print important_coefs_names
+
 #%% Write the final solution for submission
 y_pred_final = clf.predict(data_test)
 y_pred_final = pd.DataFrame(y_pred_final, columns = data_labels.columns)
 y_pred_final.to_csv("./result.csv",index=False,sep=";")
+

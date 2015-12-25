@@ -142,3 +142,24 @@ def plot_stations(feature_stats):
     plt.axis("off")
     plt.show()
         
+def plot_polutants_time_series(data):
+    #For PM10
+    PM10_series = data[[
+    "PM10_04099_0",
+    "PM10_18053_0",
+    "PM10_14012_0",
+    "PM10_14033_0",
+    "PM10_26016_0",
+    "PM10_04004_0",
+    "PM10_04031_0",
+    "PM10_04034_0"]]
+    #plot
+    average = PM10_series.mean(axis=1)
+    plt.figure()
+    plt.hold("on")
+    plt.plot(PM10_series, linewidth=1,alpha=0.4)
+    plt.plot(average, linewidth=1, color = "red",label="Average PM10 across the stations")
+    plt.legend()
+    plt.hold("off")
+    plt.show()
+    return 
