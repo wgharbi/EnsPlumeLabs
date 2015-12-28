@@ -12,7 +12,7 @@ import csv
 import networkx as nx
 import seaborn as sb
 
-sb.set_context() #Let's make some beautiful graphs ! (optionnal)
+sb.set_context() #Let's make some beautiful graphs ! (optional)
 
 data_train = pd.read_csv("./train.csv")
 writer = csv.writer(open("./labels.csv", 'w'))
@@ -29,7 +29,7 @@ plot_stations(feature_stats)
 plot_polutants_time_series(data_train)
 
 
-#%% Edit 25/12 : new idea : check the correlation bteween the features to be predicted (if not correlated create individual predictors...)
+#%% Edit 25/12 : new idea : check the correlation bteween the labels to be predicted (if not correlated create individual predictors...)
 from sklearn.preprocessing import scale
 data_to_predict=scale(data_labels,axis=0) #Rescale each columns
 cov_mat=np.abs(np.cov(data_to_predict.T))
