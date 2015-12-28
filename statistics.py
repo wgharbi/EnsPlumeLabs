@@ -153,13 +153,77 @@ def plot_polutants_time_series(data):
     "PM10_04004_0",
     "PM10_04031_0",
     "PM10_04034_0"]]
-    #plot
-    average = PM10_series.mean(axis=1)
+    
+    PM2_series = data[[
+    'PM2_5_18053_0',
+    'PM2_5_14012_0',
+    'PM2_5_14033_0',
+    'PM2_5_04034_0']]
+    
+    O3_series = data[[
+    'O3_04145_0',
+    'O3_18008_0',
+    'O3_18053_0',
+    'O3_14012_0',
+    'O3_14033_0',
+    'O3_34017_0',
+    'O3_34041_0',
+    'O3_25040_0',
+    'O3_26016_0',
+    'O3_04004_0']]
+    
+    NO2_series = data[[
+    'NO2_04105_0',
+    'NO2_04141_0',
+    'NO2_18008_0',
+    'NO2_18053_0',
+    'NO2_14012_0', 
+    'NO2_14033_0', 
+    'NO2_04059_0', 
+    'NO2_26016_0', 
+    'NO2_04004_0',
+    'NO2_04031_0', 
+    'NO2_04034_0']]
+    
+    #plot PM10
+    average_PM10 = PM10_series.mean(axis=1)
     plt.figure()
     plt.hold("on")
     plt.plot(PM10_series, linewidth=1,alpha=0.4)
-    plt.plot(average, linewidth=1, color = "red",label="Average PM10 across the stations")
+    plt.plot(average_PM10, linewidth=1, color = "red",label="Average PM10 across the stations")
+    plt.legend()
+    plt.xlabel = "Observed days"
+    plt.hold("off")
+    plt.show()
+    
+    #plot PM2
+    average_PM2 = PM2_series.mean(axis=1)
+    plt.figure()
+    plt.hold("on")
+    plt.plot(PM2_series, linewidth=1,alpha=0.4)
+    plt.plot(average_PM2, linewidth=1, color = "red",label="Average PM2_5 across the stations")
     plt.legend()
     plt.hold("off")
     plt.show()
+    
+    #plot 03
+    average_O3 = O3_series.mean(axis=1)
+    plt.figure()
+    plt.hold("on")
+    plt.plot(O3_series, linewidth=1,alpha=0.4)
+    plt.plot(average_O3, linewidth=1, color = "red",label="Average O3 across the stations")
+    plt.legend()
+    plt.hold("off")
+    plt.show()
+    
+    #plot NO2
+    average_NO2 = NO2_series.mean(axis=1)
+    plt.figure()
+    plt.hold("on")
+    plt.plot(NO2_series, linewidth=1,alpha=0.4)
+    plt.plot(average_NO2, linewidth=1, color = "red",label="Average NO2 across the stations")
+    plt.legend()
+    plt.hold("off")
+    plt.show()
+    
     return 

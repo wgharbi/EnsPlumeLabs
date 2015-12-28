@@ -111,13 +111,13 @@ not too far from each other, they will measure similar couples (wind speed, wind
 data_train = data_train.iloc[:,1:]
 data_test = data_test.iloc[:,1:]
 
-#%%
+
 from sklearn.linear_model import Ridge
 from sklearn.cross_validation import train_test_split
 
 X_train, X_test, y_train, y_test = train_test_split(data_train, data_labels, test_size=0.2, random_state=42)
 
-
+#%%
 clf=Ridge(alpha=0.1,normalize=True,solver='lsqr')
 clf.fit(X_train,y_train)
 
@@ -131,6 +131,14 @@ Quelques pistes :
     - Bien comprendre le MSE et le R2
     - Virer carrément des features ? (chi2 ?)
 """
+#%%
+from preprocessing import *
+
+
+slicer = polutantSlicer(keep_wind=False)
+slicer.fit(X_train)
+PM2,PM10,O3,NO2 = slicer.transform(X_train)
+
 
 #%% Let's have a look at our 96 predictions, in average
 from sklearn.metrics import r2_score
