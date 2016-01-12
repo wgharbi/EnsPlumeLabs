@@ -5,7 +5,67 @@ Created on Wed Jan 13 12:29:08 2016
 @author: Hugo
 """
 import matplotlib.pyplot as plt
+import seaborn as sb
 import numpy as np
+
+def plot_correlation_matrix(data,data_type):
+    from sklearn.preprocessing import scale
+    
+    if data_type== "labels":
+        data_to_predict=scale(data,axis=0) #Rescale each columns
+        cov_mat=np.abs(np.cov(data_to_predict.T))
+        
+        xlabels=12*[""]+["PM2_5"]+24*[""]+["PM10"]+24*[""]+["O3"]+24*[""]+["NO2"]
+        ylabels=12*[""]+["PM2_5"]+24*[""]+["PM10"]+24*[""]+["O3"]+24*[""]+["NO2"]
+        
+        plt.figure()
+        plt.hold('on')
+        sb.heatmap(cov_mat,cmap="Greys",square=False,xticklabels=xlabels,yticklabels=ylabels)
+        #plt.plot([96,0],[96,0],color="red",LineWidth=2)
+        plt.title("Correlation between the features to predict (in the train dataset)")
+        plt.hold('off')
+        plt.show()
+        
+        #Filter the lines repeating the same days to keep only different days
+        data_to_predict2=scale(data.iloc[0:4031:24,:],axis=0) #Rescale each columns
+        cov_mat2=np.abs(np.cov(data_to_predict2.T))
+        
+        plt.figure()
+        plt.hold('on')
+        plt.hold('on')
+        sb.heatmap(cov_mat2,cmap="Greys",square=False,xticklabels=xlabels,yticklabels=ylabels)
+        #plt.plot([96,0],[96,0],color="red",LineWidth=2)
+        plt.title("Correlation between the features to predict after filtering (in the train dataset)")
+        plt.hold('off')
+        plt.show()
+        
+    if data_type == "features":
+        data_to_train=data.drop("date",axis=1)
+        data_to_train=scale(data_to_train,axis=0) #Rescale each columns
+        cov_mat=np.abs(np.cov(data_to_train.T))
+        
+        plt.figure()
+        plt.hold('on')
+        plt.imshow(np.array(cov_mat))
+        plt.colorbar()
+        plt.tick_params(which='both', bottom='off', top='off', labelbottom='off')
+        plt.hold('off')
+        plt.show()
+        
+        #Filter the lines repeating the same days to keep only different days
+        data_to_train2=data.drop("date",axis=1)
+        data_to_train2=scale(data_to_train2.iloc[0:4031:24,:],axis=0) #Rescale each columns and take only different days
+        
+        cov_mat2=np.abs(np.cov(data_to_train2.T))
+        
+        plt.figure()
+        plt.hold('on')
+        plt.imshow(np.array(cov_mat2))
+        plt.colorbar()
+        plt.tick_params(which='both', bottom='off', top='off', labelbottom='off')
+        plt.hold('off')
+        plt.show()
+    
 
 def plot_average_regression(y_pred,y_test):
     fig, ax = plt.subplots()
@@ -56,6 +116,8 @@ def plot_regression_coefficient(reg,data_train):
 def plot_MSE_per_hour(y_pred,y_test):
     from sklearn.metrics import mean_squared_error
     #This function plots, for each pollutant, the MSE made by the regression along the hours to predict (ie the successive columns)
+        
+    
     PM2_pred = y_pred[:,:24]
     PM10_pred = y_pred[:,24:48]
     O3_pred = y_pred[:,48:72]
