@@ -116,6 +116,7 @@ from sklearn.linear_model import Ridge
 from sklearn.cross_validation import train_test_split
 
 X_train, X_test, y_train, y_test = train_test_split(data_train, data_labels, test_size=0.2, random_state=42)
+y_test
 
 #%%
 clf=Ridge(alpha=0.1,normalize=True,solver='lsqr')
@@ -143,38 +144,21 @@ PM2,PM10,O3,NO2 = slicer.transform(X_train)
 #%% Let's have a look at our 96 predictions, in average
 from sklearn.metrics import r2_score
 from sklearn.metrics import mean_squared_error
+from visualization import *
 
 y_pred = clf.predict(X_test)
 print "MSE : ", mean_squared_error(y_test,y_pred)
 print "R2 : ",r2_score(y_test,y_pred)
 
-fig, ax = plt.subplots()
-plt.hold("on")
-ax.plot(np.arange(0,96),np.mean(y_test,axis=0),color="red",label="Average real value")
-ax.plot(np.arange(0,96),np.mean(y_pred,axis=0),color="blue",label="Average predicted value")
-ax.axvline(x=24,color="grey",linestyle="dashed")
-ax.axvline(x=48,color="grey",linestyle="dashed")
-ax.axvline(x=72,color="grey",linestyle="dashed")
-ax.set_xlabel('Polutant')
-ax.set_ylabel("Concentration")
-ax.legend(loc="lower right")
-plt.hold("off")
-plt.show()
+plot_average_regression(y_pred,y_test)
 
 #%% Let's have a look at the weights, in average, of the regression coefficients
 
-coefs=clf.coef_
-fig, ax = plt.subplots()
-ax.bar(np.arange(0,3728),np.mean(coefs,axis=0), color = "blue")
-ax.set_xlabel('Coefficent index')
-ax.set_ylabel("Average value")
-plt.show()
+plot_regression_coefficient(clf,data_train)
 
-#check the most important coeffs, in averaged
-threshold = 0.3
-important_coefs=np.abs(np.mean(coefs,axis=0))>threshold
-important_coefs_names=data_train.columns[important_coefs]
-print important_coefs_names
+#%% Let's have a look at the individual contributions of our regression to the total MSE (MSE per hour)
+
+plot_MSE_per_hour(y_pred,y_test)
 
 #%% Write the final solution for submission
 y_pred_final = clf.predict(data_test)
