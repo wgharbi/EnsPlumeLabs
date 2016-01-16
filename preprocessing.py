@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Dec 25 19:32:01 2015
 
-@author: Hugo
-"""
 import pandas as pd
 
 class polutantSlicer :

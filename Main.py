@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Dec 15 14:34:20 2015
 
-@author: Hugo
-"""
 
 import pandas as pd
 import numpy as np
@@ -59,7 +55,7 @@ plt.hold('off')
 plt.show()
 
 """Interpretation of the results :
-    Each square is a correlation matrix of 24 features to be predicted in the following
+    Each square is a correlation matrix of 24 labels to be predicted in the following
     order : PM2,PM10,O3,NO2
     - PM2 and PM10 are highly correlated to themselves on a 24h window (size of the squares)
     meaning that these polutants are less volatile and thus less prone to high variations
@@ -70,7 +66,7 @@ plt.show()
     - NO2 is middly correlated to the 3 
 """    
 #%% Let's do the same thing with the input data
-"""Note for Wiem : 
+"""Note: 
     Les données d'entrée sont super corrélées dans la mesure où le dataset est constitué 
     de jour glissants (ie, une ligne = la ligne précédente translatée d'1h), du coup, lignes
     et features sont fortement corrélés, en atteste la figure suivante, ce qui peut être 
@@ -99,13 +95,6 @@ plt.tick_params(which='both', bottom='off', top='off', labelbottom='off')
 plt.hold('off')
 plt.show()
 
-"""Interpreting the results
-Globally, the data columns are not really correlated, exept for a set of indicators : the wind indicators
-This explains the repating diagonal black pattern (appears 17 times on a line because there are
-17 stations measuring the wind speed and direction). This seems logical : if the stations are
-not too far from each other, they will measure similar couples (wind speed, wind direction)
-
-"""
 
 #%% Let's remove the date column
 data_train = data_train.iloc[:,1:]
@@ -122,16 +111,6 @@ y_test
 clf=Ridge(alpha=0.1,normalize=True,solver='lsqr')
 clf.fit(X_train,y_train)
 
-
-"""
-Quelques pistes :
-    - Faire une moyenne des mesures des 24 dernières heure par polluants et faire regression là-dessus, plutot qu'avec les valeurs de chaque station
-    - Bien faire gaffe que la prediction finale se fait sur la station 04143, penser à donner des "poids" aux données de chaque station (plus pour 04143)
-    - Autres regressions possibles
-    - Cross valider et optimiser les hyper-paramètres.
-    - Bien comprendre le MSE et le R2
-    - Virer carrément des features ? (chi2 ?)
-"""
 #%%
 from preprocessing import *
 

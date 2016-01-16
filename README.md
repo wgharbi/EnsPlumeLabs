@@ -16,7 +16,7 @@ Hugo Vallet hugo.vallet@polytechnique.edu
 
 ### Challenge context
 
-Plume Labs is a start up company whose goals is to provide everyone with some information regarding the level of pollution so that they will know about it and be able to act so as to reduce the impact on their health.
+Plume Labs is a start up company whose goal is to provide everyone with some information regarding the level of pollution so that they will know about it and be able to act so as to reduce the impact on their health.
 
 www.plumelabs.com
 

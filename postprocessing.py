@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Wed Jan 13 14:42:04 2016
 
-@author: Hugo
-"""
 import numpy as np
 
 def sum_diag(mat,i,j):
