@@ -68,3 +68,43 @@ class polutantSlicer :
         #!!!!POUR LE MOMENT LE VENT N'EST PAS PRIS EN COMPTE
         return PM2,PM10,O3,NO2
         
+        
+        
+def concat_wind_features(data):
+    windspeed_cols = data.filter(regex="windSpeed")
+    windcos_cols = data.filter(regex="windBearingCos")
+    windsin_cols = data.filter(regex="windBearingSin")
+    
+    #Let's generate 3 empty data frames with the columns names we want
+    speed_col_names = []
+    windsin_col_names = []
+    windcos_col_names = []
+    for i in range(-24,25):
+        speed_name = "windSpeed_"+str(i)
+        sin_name = "windBearingSin_"+str(i)
+        cos_name = "windBearingCos_"+str(i)
+        speed_col_names.append(speed_name)
+        windsin_col_names.append(sin_name)
+        windcos_col_names.append(cos_name)
+    
+    windspeed_processed = pd.DataFrame(columns=speed_col_names)
+    windcos_processed = pd.DataFrame(columns=windcos_col_names)
+    windsin_processed = pd.DataFrame(columns=windsin_col_names)
+    
+    #Fill the 3 data frames with the average values of the speed measures on the stations hour per hour (49h per wind measure)
+    for i in range(0,49):
+        windspeed_processed.iloc[:,i] = windspeed_cols.iloc[:,i::49].mean(axis=1)
+        windcos_processed.iloc[:,i] = windcos_cols.iloc[:,i::49].mean(axis=1)
+        windsin_processed.iloc[:,i] = windsin_cols.iloc[:,i::49].mean(axis=1)
+        
+        
+    data_processed = pd.concat([windspeed_processed,windcos_processed,windsin_processed],axis=1)
+    
+    cols_to_keep = [c for c in data.columns if c.lower()[:4] != 'wind'] #Withdraw columns containing wind measures
+    data=data[cols_to_keep]
+    
+    data_processed = pd.concat([data,data_processed],axis=1) #complete data with processed wind measures
+    
+    return data_processed
+    
+    
