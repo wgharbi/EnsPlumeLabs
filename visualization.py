@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Wed Jan 13 12:29:08 2016
 
-@author: Hugo
-"""
 import matplotlib.pyplot as plt
 import seaborn as sb
 import numpy as np

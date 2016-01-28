@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Dec 15 14:34:20 2015
 
-@author: Hugo
-"""
 
 import pandas as pd
 import numpy as np
@@ -37,7 +33,7 @@ plot_polutants_time_series(data_train)
 plot_correlation_matrix(data_labels,data_type="labels")
 
 """Interpretation of the results :
-    Each square is a correlation matrix of 24 features to be predicted in the following
+    Each square is a correlation matrix of 24 labels to be predicted in the following
     order : PM2,PM10,O3,NO2
     - PM2 and PM10 are highly correlated to themselves on a 24h window (size of the squares)
     meaning that these polutants are less volatile and thus less prone to high variations
@@ -49,13 +45,9 @@ plot_correlation_matrix(data_labels,data_type="labels")
 """    
 #%% Let's do the same thing with the input data
 
+
 plot_correlation_matrix(data_train,data_type="features")
-"""Note for Wiem : 
-    Les données d'entrée sont super corrélées dans la mesure où le dataset est constitué 
-    de jour glissants (ie, une ligne = la ligne précédente translatée d'1h), du coup, lignes
-    et features sont fortement corrélés, en atteste la figure suivante, ce qui peut être 
-    problématique pour la régression (générer de l'over-fitting)...
-    """
+
 data_to_train=scale(data_train,axis=0) #Rescale each columns
 cov_mat=np.abs(np.cov(data_to_train.T))
 
@@ -79,13 +71,6 @@ plt.tick_params(which='both', bottom='off', top='off', labelbottom='off')
 plt.hold('off')
 plt.show()
 
-"""Interpreting the results
-Globally, the data columns are not really correlated, exept for a set of indicators : the wind indicators
-This explains the repating diagonal black pattern (appears 17 times on a line because there are
-17 stations measuring the wind speed and direction). This seems logical : if the stations are
-not too far from each other, they will measure similar couples (wind speed, wind direction)
-
-"""
 
 #%% Let's remove the date column
 data_train = data_train.iloc[:,1:]
@@ -114,16 +99,6 @@ from sklearn.linear_model import Ridge
 clf=Ridge(alpha=0.1,normalize=True,solver='lsqr')
 clf.fit(X_train,y_train)
 
-
-"""
-Quelques pistes :
-    - Faire une moyenne des mesures des 24 dernières heure par polluants et faire regression là-dessus, plutot qu'avec les valeurs de chaque station
-    - Bien faire gaffe que la prediction finale se fait sur la station 04143, penser à donner des "poids" aux données de chaque station (plus pour 04143)
-    - Autres regressions possibles
-    - Cross valider et optimiser les hyper-paramètres.
-    - Bien comprendre le MSE et le R2
-    - Virer carrément des features ? (chi2 ?)
-"""
 #%%
 from sklearn.ensemble.forest import RandomForestRegressor
 clf=RandomForestRegressor(n_estimators = 15,criterion='mse')
@@ -157,19 +132,7 @@ plot_regression_coefficient(clf,data_train)
 from postprocessing import *
 
 plot_MSE_per_hour(y_pred,y_test)
-"""
-Ce genre de résultat pourrait être réutilisé dans un post-processing moyenneur "weighted"
-Note :
-    Les arbres sont plus robustes, en erreur, à l'heure de prédiction que les linear models.
-"""
 
-"""
-ATTENTION WIEM :
-    Mon post-processing à besoin d'avoir en entrée des lignes "triées" par date/heure comme le format initial et le format
-    final. par conséquent il n'est pas possible (pour l'instant) d'effectuer de postprocessing sur y_pred et de tester les valeurs
-    pour la raison que test_train_split mélange les examples d'apprentissage ! (donc perte de l'ordre dans l'ensemble
-    de test, donc impossible de postprocess y_pred). 
-"""
 
 
 #%% Write the final solution for submission
