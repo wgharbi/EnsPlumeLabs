@@ -10,6 +10,7 @@ import numpy as np
 
 def plot_correlation_matrix(data,data_type):
     from sklearn.preprocessing import scale
+    import seaborn as sb
     
     if data_type== "labels":
         data_to_predict=scale(data,axis=0) #Rescale each columns
@@ -26,6 +27,7 @@ def plot_correlation_matrix(data,data_type):
         plt.hold('off')
         plt.show()
         
+        """
         #Filter the lines repeating the same days to keep only different days
         data_to_predict2=scale(data.iloc[0:4031:24,:],axis=0) #Rescale each columns
         cov_mat2=np.abs(np.cov(data_to_predict2.T))
@@ -38,6 +40,7 @@ def plot_correlation_matrix(data,data_type):
         plt.title("Correlation between the features to predict after filtering (in the train dataset)")
         plt.hold('off')
         plt.show()
+        """
         
     if data_type == "features":
         data_to_train=data.drop("date",axis=1)
@@ -52,6 +55,7 @@ def plot_correlation_matrix(data,data_type):
         plt.hold('off')
         plt.show()
         
+        """
         #Filter the lines repeating the same days to keep only different days
         data_to_train2=data.drop("date",axis=1)
         data_to_train2=scale(data_to_train2.iloc[0:4031:24,:],axis=0) #Rescale each columns and take only different days
@@ -65,6 +69,7 @@ def plot_correlation_matrix(data,data_type):
         plt.tick_params(which='both', bottom='off', top='off', labelbottom='off')
         plt.hold('off')
         plt.show()
+        """
     
 
 def plot_average_regression(y_pred,y_test):

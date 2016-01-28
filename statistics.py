@@ -98,15 +98,19 @@ def stats(data):
     return global_stats,stations_stats, feature_stats, features_available_station
     
 def plot_stats(feature_stats):
-    plt.figure()
+    fig,ax=plt.subplots(1,1,figsize=(10,6))
     feature_stats["Feature"].value_counts().plot(kind="bar")
-    plt.xlabel="Type de feature"
-    plt.ylabel="Nb disponibles"
+    ax.set_xlabel("Feature type")
+    ax.set_ylabel("Number available")
+    ax.set_title("Total number of features available per type")
     plt.show()
-    plt.figure()
+    
+    fig,ax=plt.subplots(1,1,figsize=(10,6))
     feature_stats["Station"].value_counts().plot(kind="bar")
-    plt.xlabel="N° de station"
-    plt.ylabel="Nb de features disponibles"
+    ax.set_xlabel("Station ID")
+    ax.set_ylabel("Total number of features available")
+    ax.set_title("Total number of features available per station")
+    plt.show()
     
     
     
@@ -187,43 +191,52 @@ def plot_polutants_time_series(data):
     
     #plot PM10
     average_PM10 = PM10_series.mean(axis=1)
-    plt.figure()
+    fig,ax = plt.subplots(1,1,figsize=(10,6))
     plt.hold("on")
-    plt.plot(PM10_series, linewidth=1,alpha=0.4)
-    plt.plot(average_PM10, linewidth=1, color = "red",label="Average PM10 across the stations")
-    plt.legend()
-    plt.xlabel = "Observed days"
+    ax.plot(PM10_series, linewidth=1,alpha=0.4)
+    ax.plot(average_PM10, linewidth=1, color = "red",label="Average PM10 across the stations")
+    ax.legend()
+    ax.set_xlabel("Hours")
+    ax.set_ylabel("Concentration")
     plt.hold("off")
     plt.show()
     
     #plot PM2
     average_PM2 = PM2_series.mean(axis=1)
-    plt.figure()
+    fig,ax = plt.subplots(1,1,figsize=(10,6))
     plt.hold("on")
-    plt.plot(PM2_series, linewidth=1,alpha=0.4)
-    plt.plot(average_PM2, linewidth=1, color = "red",label="Average PM2_5 across the stations")
-    plt.legend()
+    ax.plot(PM2_series, linewidth=1,alpha=0.4)
+    ax.plot(average_PM2, linewidth=1, color = "red",label="Average PM2_5 across the stations")
+    ax.legend()
+    ax.set_xlabel("Hours")
+    ax.set_ylabel("Concentration")
     plt.hold("off")
     plt.show()
     
     #plot 03
     average_O3 = O3_series.mean(axis=1)
-    plt.figure()
+    fig,ax = plt.subplots(1,1,figsize=(10,6))
     plt.hold("on")
-    plt.plot(O3_series, linewidth=1,alpha=0.4)
-    plt.plot(average_O3, linewidth=1, color = "red",label="Average O3 across the stations")
-    plt.legend()
+    ax.plot(O3_series, linewidth=1,alpha=0.4)
+    ax.plot(average_O3, linewidth=1, color = "red",label="Average O3 across the stations")
+    ax.legend()
+    ax.set_xlabel("Hours")
+    ax.set_ylabel("Concentration")
     plt.hold("off")
     plt.show()
     
     #plot NO2
     average_NO2 = NO2_series.mean(axis=1)
-    plt.figure()
+    fig,ax = plt.subplots(1,1,figsize=(10,6))
     plt.hold("on")
-    plt.plot(NO2_series, linewidth=1,alpha=0.4)
-    plt.plot(average_NO2, linewidth=1, color = "red",label="Average NO2 across the stations")
-    plt.legend()
+    ax.plot(NO2_series, linewidth=1,alpha=0.4)
+    ax.plot(average_NO2, linewidth=1, color = "red",label="Average NO2 across the stations")
+    ax.legend()
+    ax.set_xlabel("Hours")
+    ax.set_ylabel("Concentration")
     plt.hold("off")
     plt.show()
     
     return 
+    
+    

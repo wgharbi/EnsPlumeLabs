@@ -7,10 +7,13 @@ Created on Tue Dec 15 14:34:20 2015
 
 import pandas as pd
 import numpy as np
-from statistics import *
 import csv
-import networkx as nx
 import seaborn as sb
+
+from preprocessing import *
+from visualization import *
+from statistics import *
+from postprocessing import *
 
 sb.set_context() #Let's make some beautiful graphs ! (optional)
 
@@ -30,33 +33,8 @@ plot_polutants_time_series(data_train)
 
 
 #%% Edit 25/12 : new idea : check the correlation bteween the labels to be predicted (if not correlated create individual predictors...)
-from sklearn.preprocessing import scale
-data_to_predict=scale(data_labels,axis=0) #Rescale each columns
-cov_mat=np.abs(np.cov(data_to_predict.T))
 
-xlabels=12*[""]+["PM2_5"]+24*[""]+["PM10"]+24*[""]+["O3"]+24*[""]+["NO2"]
-ylabels=12*[""]+["PM2_5"]+24*[""]+["PM10"]+24*[""]+["O3"]+24*[""]+["NO2"]
-
-plt.figure()
-plt.hold('on')
-sb.heatmap(cov_mat,cmap="Greys",square=False,xticklabels=xlabels,yticklabels=ylabels)
-#plt.plot([96,0],[96,0],color="red",LineWidth=2)
-plt.title("Correlation between the features to predict (in the train dataset)")
-plt.hold('off')
-plt.show()
-
-#Filter the lines repeating the same days to keep only different days
-data_to_predict2=scale(data_labels.iloc[0:4031:24,:],axis=0) #Rescale each columns
-cov_mat2=np.abs(np.cov(data_to_predict2.T))
-
-plt.figure()
-plt.hold('on')
-plt.hold('on')
-sb.heatmap(cov_mat2,cmap="Greys",square=False,xticklabels=xlabels,yticklabels=ylabels)
-#plt.plot([96,0],[96,0],color="red",LineWidth=2)
-plt.title("Correlation between the features to predict after filtering (in the train dataset)")
-plt.hold('off')
-plt.show()
+plot_correlation_matrix(data_labels,data_type="labels")
 
 """Interpretation of the results :
     Each square is a correlation matrix of 24 features to be predicted in the following
@@ -70,6 +48,8 @@ plt.show()
     - NO2 is middly correlated to the 3 
 """    
 #%% Let's do the same thing with the input data
+
+plot_correlation_matrix(data_train,data_type="features")
 """Note for Wiem : 
     Les données d'entrée sont super corrélées dans la mesure où le dataset est constitué 
     de jour glissants (ie, une ligne = la ligne précédente translatée d'1h), du coup, lignes
@@ -112,13 +92,25 @@ data_train = data_train.iloc[:,1:]
 data_test = data_test.iloc[:,1:]
 
 
-from sklearn.linear_model import Ridge
 from sklearn.cross_validation import train_test_split
 
 X_train, X_test, y_train, y_test = train_test_split(data_train, data_labels, test_size=0.2, random_state=42)
-y_test
+y_test=y_test.values
+y_train=y_train.values
+
+#%% Other splitting without shuffling (to keep dates ordering)
+data_train = data_train.iloc[:,1:]
+data_test = data_test.iloc[:,1:]
+
+nb_points=data_train.shape[0]
+slice_index = round(0.8*nb_points)
+X_train, X_test, y_train, y_test = data_train.iloc[:slice_index,:],data_train.iloc[slice_index:,:],data_labels.iloc[:slice_index,:],data_labels.iloc[slice_index:,:]
+
+y_test=y_test.values
+y_train=y_train.values
 
 #%%
+from sklearn.linear_model import Ridge
 clf=Ridge(alpha=0.1,normalize=True,solver='lsqr')
 clf.fit(X_train,y_train)
 
@@ -132,6 +124,10 @@ Quelques pistes :
     - Bien comprendre le MSE et le R2
     - Virer carrément des features ? (chi2 ?)
 """
+#%%
+from sklearn.ensemble.forest import RandomForestRegressor
+clf=RandomForestRegressor(n_estimators = 15,criterion='mse')
+clf.fit(X_train,y_train)
 #%%
 from preprocessing import *
 
@@ -147,8 +143,9 @@ from sklearn.metrics import mean_squared_error
 from visualization import *
 
 y_pred = clf.predict(X_test)
-print "MSE : ", mean_squared_error(y_test,y_pred)
+print "MSE : ", (np.sum(np.square(y_test-y_pred)))/((96))
 print "R2 : ",r2_score(y_test,y_pred)
+print "MSE sklearn : ", mean_squared_error(y_test,y_pred)
 
 plot_average_regression(y_pred,y_test)
 
@@ -157,11 +154,33 @@ plot_average_regression(y_pred,y_test)
 plot_regression_coefficient(clf,data_train)
 
 #%% Let's have a look at the individual contributions of our regression to the total MSE (MSE per hour)
+from postprocessing import *
 
 plot_MSE_per_hour(y_pred,y_test)
+"""
+Ce genre de résultat pourrait être réutilisé dans un post-processing moyenneur "weighted"
+Note :
+    Les arbres sont plus robustes, en erreur, à l'heure de prédiction que les linear models.
+"""
+
+"""
+ATTENTION WIEM :
+    Mon post-processing à besoin d'avoir en entrée des lignes "triées" par date/heure comme le format initial et le format
+    final. par conséquent il n'est pas possible (pour l'instant) d'effectuer de postprocessing sur y_pred et de tester les valeurs
+    pour la raison que test_train_split mélange les examples d'apprentissage ! (donc perte de l'ordre dans l'ensemble
+    de test, donc impossible de postprocess y_pred). 
+"""
+
 
 #%% Write the final solution for submission
 y_pred_final = clf.predict(data_test)
-y_pred_final = pd.DataFrame(y_pred_final, columns = data_labels.columns)
-y_pred_final.to_csv("./result.csv",index=False,sep=";")
+
+plot_correlation_matrix(y_pred_final,data_type="labels")
+
+y_pred_final_filtered = multi_polutant_averaged_postprocessing(y_pred.values,method="Backward average")
+
+plot_correlation_matrix(y_pred_final_filtered,data_type="labels")
+
+y_pred_final_filtered = pd.DataFrame(y_pred_final_filtered, columns = data_labels.columns)
+y_pred_final_filtered.to_csv("./result.csv",index=False,sep=";")
 
