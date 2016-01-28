@@ -65,7 +65,10 @@ class polutantSlicer :
         
         
         
-def concat_wind_features(data):
+def add_averaged_wind_features(data,drop=False):
+    #The drop option allows the user to drop the wind features and replace them by their averaged values    
+    
+    
     windspeed_cols = data.filter(regex="windSpeed")
     windcos_cols = data.filter(regex="windBearingCos")
     windsin_cols = data.filter(regex="windBearingSin")
@@ -102,4 +105,45 @@ def concat_wind_features(data):
     
     return data_processed
     
+    
+def add_averaged_polutants_features(data):
+    PM2_cols = data.filter(regex="PM2")
+    PM10_cols = data.filter(regex="PM10")
+    O3_cols = data.filter(regex="O3")
+    NO2_cols = data.filter(regex="NO2")    
+    
+    #Let's generate 3 empty data frames with the columns names we want
+    PM2_col_names = []
+    PM10_col_names = []
+    O3_col_names = []
+    NO2_col_names = []
+    for i in range(-24,1):
+        PM2_name = "Av_PM2_"+str(i)
+        PM10_name = "Av_PM10_"+str(i)
+        O3_name = "Av_O3_"+str(i)
+        NO2_name = "Av_NO2_"+str(i)
+        PM2_col_names.append(PM2_name)
+        PM10_col_names.append(PM10_name)
+        O3_col_names.append(O3_name)
+        NO2_col_names.append(NO2_name)
+    
+    PM2_processed = pd.DataFrame(columns=PM2_col_names)
+    PM10_processed = pd.DataFrame(columns=PM10_col_names)
+    O3_processed = pd.DataFrame(columns=O3_col_names)
+    NO2_processed = pd.DataFrame(columns=NO2_col_names)
+    i=0
+    #Fill the 3 data frames with the average values of the speed measures on the stations hour per hour (49h per wind measure)
+    for i in range(0,25):
+        PM2_processed.iloc[:,i] = PM2_cols.iloc[:,i::25].mean(axis=1)
+        PM10_processed.iloc[:,i] = PM10_cols.iloc[:,i::25].mean(axis=1)
+        O3_processed.iloc[:,i] = O3_cols.iloc[:,i::25].mean(axis=1)
+        NO2_processed.iloc[:,i] = NO2_cols.iloc[:,i::25].mean(axis=1)
+        
+        
+    data_processed = pd.concat([PM2_processed,PM10_processed,O3_processed,NO2_processed],axis=1)
+    
+    
+    data_processed = pd.concat([data,data_processed],axis=1) #complete data with processed wind measures
+    
+    return data_processed
     

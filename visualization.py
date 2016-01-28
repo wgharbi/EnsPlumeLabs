@@ -114,6 +114,21 @@ def plot_regression_coefficient(reg,data_train):
         important_coefs_names=data_train.columns[important_coefs]
         print important_coefs_names
         
+        
+def plot_coeff_importances(reg,data_train):
+    X_columns = data_train.columns
+    
+    ordering = np.argsort(reg.feature_importances_)[::-1][:50]
+    importances = reg.feature_importances_[ordering]
+    feature_names = X_columns[ordering]
+    x = np.arange(len(feature_names))
+    
+    fig,ax = plt.subplots(1,1,figsize=(6,6))
+    ax.bar(x, importances)
+    ax.set_xticks(x + 0.5)
+    ax.set_xticklabels(feature_names, rotation=90, fontsize=8)
+    ax.set_ylabel('Feature importance')        
+    
 def plot_MSE_per_hour(y_pred,y_test):
     from sklearn.metrics import mean_squared_error
     #This function plots, for each pollutant, the MSE made by the regression along the hours to predict (ie the successive columns)
