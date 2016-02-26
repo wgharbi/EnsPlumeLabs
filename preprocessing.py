@@ -131,8 +131,8 @@ def add_averaged_polutants_features(data):
     PM10_processed = pd.DataFrame(columns=PM10_col_names)
     O3_processed = pd.DataFrame(columns=O3_col_names)
     NO2_processed = pd.DataFrame(columns=NO2_col_names)
-    i=0
-    #Fill the 3 data frames with the average values of the speed measures on the stations hour per hour (49h per wind measure)
+    #Fill the 3 data frames with the average values of the speed measures on the stations hour per hour (25h per polutant measure)
+    
     for i in range(0,25):
         PM2_processed.iloc[:,i] = PM2_cols.iloc[:,i::25].mean(axis=1)
         PM10_processed.iloc[:,i] = PM10_cols.iloc[:,i::25].mean(axis=1)
@@ -147,3 +147,32 @@ def add_averaged_polutants_features(data):
     
     return data_processed
     
+def add_averaged_polutants_features2(data):
+    
+    PM2_mean = pd.DataFrame()
+    PM10_mean = pd.DataFrame() 
+    O3_mean = pd.DataFrame() 
+    NO2_mean = pd.DataFrame()     
+    i=-8
+    for i in range(-24,1):
+        PM2 = "PM2_5_(.+?)_" + str(i) + "\\b"
+        PM2_name = "PM2_5_mean_"+str(i)
+        
+        PM10 = "PM10_(.+?)_"+str(i) + "\\b"
+        PM10_name = "PM10_mean_"+str(i)
+        
+        NO2 = "NO2_(.+?)_"+str(i) + "\\b"
+        NO2_name = "NO2_mean_"+str(i)
+        
+        O3 = "O3_(.+?)_"+str(i) + "\\b"
+        O3_name = "O3_mean_"+str(i)
+        
+        PM2_value=data.filter(regex=PM2) 
+        PM2_mean[PM2_name]=PM2_value.mean(axis=1)
+        PM10_mean[PM10_name]=data.filter(regex=PM10).mean(axis=1) 
+        O3_mean[O3_name]=data.filter(regex=O3).mean(axis=1) 
+        NO2_mean[NO2_name]=data.filter(regex=NO2).mean(axis=1) 
+        
+    data_processed = pd.concat([data, PM2_mean,PM10_mean,O3_mean,NO2_mean],axis=1)
+    
+    return data_processed

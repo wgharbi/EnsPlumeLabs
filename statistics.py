@@ -114,15 +114,18 @@ def plot_stations(feature_stats):
     import  matplotlib.colors as cl
     import networkx as nx
     station_names=feature_stats["Station"].unique().astype(str)
+    station_names[0], station_names[4] = station_names[4], station_names[0]
     G=nx.Graph()
     pos=nx.spring_layout(G)
     color=[]
+    nodes=[]
     for i in range(len(station_names)):
         G.add_node(station_names[i])
         G.add_edge(station_names[0],station_names[i])
         temp = feature_stats[feature_stats["Station"]==station_names[i]]
         features_available=len(temp["Feature"].unique())
         color.append(features_available)
+        nodes.append(station_names[i])
     
     
     vmin = min(color)
@@ -132,7 +135,7 @@ def plot_stations(feature_stats):
     
     
     fig=plt.figure(figsize=(10,6))
-    nx.draw_networkx(G,node_color=color, node_size=2000, cmap=cmap,alpha=1,font_size=10)
+    nx.draw_networkx(G,nodelist=nodes,node_color=color, node_size=2000, cmap=cmap,alpha=1,font_size=10)
     plt.xlabel="hello"
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     sm._A = []
